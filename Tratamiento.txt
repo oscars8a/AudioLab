@@ -7,3 +7,10 @@ https://docs.oracle.com/javase/7/docs/api/javax/sound/sampled/DataLine.html#stop
 https://stackoverflow.com/questions/26305/how-can-i-play-sound-in-java
 
 https://docs.oracle.com/javase/7/docs/api/javax/sound/sampled/AudioInputStream.html
+
+
+Clases a utilizar:
+
+AudioInputStream / AudioOutputStream
+AudioSystem
+Clip --> Extends DataLine
