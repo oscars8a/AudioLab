@@ -1,0 +1,9 @@
+https://stackoverflow.com/questions/16915241/how-do-i-pause-a-clip-java
+
+https://stackoverflow.com/questions/6045384/playing-mp3-and-wav-in-java
+
+https://docs.oracle.com/javase/7/docs/api/javax/sound/sampled/DataLine.html#stop()
+
+https://stackoverflow.com/questions/26305/how-can-i-play-sound-in-java
+
+https://docs.oracle.com/javase/7/docs/api/javax/sound/sampled/AudioInputStream.html
