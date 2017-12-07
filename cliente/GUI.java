@@ -6,7 +6,10 @@
 package cliente;
 
 import java.awt.event.ItemEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import javax.swing.DefaultListModel;
 import javax.swing.ListModel;
@@ -17,13 +20,14 @@ import javax.swing.ListModel;
  */
 public class GUI extends javax.swing.JFrame {
 
-    private static GUI gui;
-    
+    private Reproductor player;
+
     /**
      * Creates new form GUI
      */
     public GUI() {
         initComponents();
+        player = new Reproductor();
     }
 
     /**
@@ -47,6 +51,7 @@ public class GUI extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("AudioLab");
         setName("Panel"); // NOI18N
+        setResizable(false);
 
         botonPlayPause.setLabel("Play/Pause");
         botonPlayPause.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -81,7 +86,11 @@ public class GUI extends javax.swing.JFrame {
             }
         });
 
+        jScrollPane1.setAutoscrolls(true);
+        jScrollPane1.setHorizontalScrollBar(null);
+
         listaCanciones.setToolTipText("Lista de Canciones");
+        listaCanciones.setAutoscrolls(false);
         jScrollPane1.setViewportView(listaCanciones);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -138,38 +147,64 @@ public class GUI extends javax.swing.JFrame {
 
     private void botonPlayPauseMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonPlayPauseMouseClicked
         // TODO add your handling code here:
-            //reproductor.resume();
-            //reproductor.pause();
+        player.resumePause();
     }//GEN-LAST:event_botonPlayPauseMouseClicked
 
     private void botonSiguienteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonSiguienteMouseClicked
-        // TODO add your handling code here:
-            //reprodutor.siguiente();
+        if (evt.getButton() == MouseEvent.BUTTON1) {
+            cambiarIndiceLista("Siguiente");
+        }
     }//GEN-LAST:event_botonSiguienteMouseClicked
 
     private void botonAnteriorMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonAnteriorMouseClicked
-        // TODO add your handling code here:
-            //reproductor.anterior();
+
+        if (evt.getButton() == MouseEvent.BUTTON1) {
+            cambiarIndiceLista("Anterior");
+        }
     }//GEN-LAST:event_botonAnteriorMouseClicked
 
+    
+    private void cambiarIndiceLista(String direccion) {
+        int seleccion = this.listaCanciones.getSelectedIndex();
+        switch (direccion) {
+            case "Anterior":
+                if (seleccion != -1) {
+                    if (seleccion != 0) {
+                        this.listaCanciones.setSelectedIndex(seleccion - 1);
+                    } else {
+                        this.listaCanciones.setSelectedIndex(this.listaCanciones.getModel().getSize() - 1);
+                    }
+                }
+                break;
+            case "Siguiente":
+                if (seleccion != -1) {
+                    if (seleccion != this.listaCanciones.getModel().getSize() - 1) {
+                        this.listaCanciones.setSelectedIndex(seleccion + 1);
+                    } else {
+                        this.listaCanciones.setSelectedIndex(0);
+                    }
+                }
+                break;
+        }
+    }
+    
     private void comboTiposItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboTiposItemStateChanged
         // TODO add your handling code here:
-        if(evt.getStateChange() == ItemEvent.SELECTED){
-            String item = (String)evt.getItem();
+        if (evt.getStateChange() == ItemEvent.SELECTED) {
+            String item = (String) evt.getItem();
             DefaultListModel dlm = new DefaultListModel();
-            if(item.equals("Canciones")){
-               // File f = new File ("C:/Users/Héctor/Música/DTM(TG)GreenDaRevRadi/DTM(TG)GreenDaRevRadi/Green Day - Revolution Radio (2016)");
-               // for(int i = 0; i< f.listFiles().length; i++){
-               //    dlm.addElement(f.listFiles()[i].getName());
-               // }
-                gui.listaCanciones.setModel(dlm);
+            if (item.equals("Canciones")) {
+                // File f = new File ("C:/Users/Héctor/Música/DTM(TG)GreenDaRevRadi/DTM(TG)GreenDaRevRadi/Green Day - Revolution Radio (2016)");
+                // for(int i = 0; i< f.listFiles().length; i++){
+                //    dlm.addElement(f.listFiles()[i].getName());
+                // }
+                this.listaCanciones.setModel(dlm);
                 //Llamar a getCanciones
                 //gui.listaCanciones.setModel((DefaultListModel)negocio.getCanciones());
-                gui.comboTipos.addItem("HOLA");
+            } else if (item.equals("Emisoras")) //Llamar a getEmisoras
+            {
+
             }
-            else if(item.equals("Emisoras"))
-                //Llamar a getEmisoras
-                gui.comboTipos.addItem("ADIOS");
         }
     }//GEN-LAST:event_comboTiposItemStateChanged
 
@@ -203,17 +238,17 @@ public class GUI extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                gui = new GUI();
-                gui.setVisible(true);    
+                GUI gui = new GUI();
+                gui.setVisible(true);
                 //Cambiar esta siguiente línea por el método pertinente para recoger canciones
                 //DefaultListModel canciones = (DefaultListModel) negocio.getCanciones();
                 DefaultListModel def = new DefaultListModel();
 
-                for(int i = 0; i < 20 ; ++i){
-                    def.addElement("Cancion "  + i);
-                   }
-                gui.listaCanciones.setModel(def);
+                for (int i = 0; i < 20; ++i) {
+                    def.addElement("Cancion " + i);
                 }
+                gui.listaCanciones.setModel(def);
+            }
         });
     }
 
