@@ -4,13 +4,11 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 
 
@@ -27,29 +25,38 @@ public class Persistencia implements Runnable {
 
 	public static void main(String[] args) {
 		try {
-			String directorio = "musica";
-			Map<String,URL> emisoras = null;
-			emisoras.put("RockFM", new URL("http://player.rockfm.fm/"));
-			emisoras.put("EMisora", new URL("nueva emisora"));
+			String directorio = "src/public_canciones";
+			Map<String,URL> emisoras = new HashMap<String, URL>();
+			emisoras.put("rock_fm", new URL("http://player.rockfm.fm/"));
+			emisoras.put("40_principales", new URL("https://play.los40.com/"));
+			emisoras.put("lory_money", new URL("https://youtu.be/Gxgwizczm48"));
+			
+			Persistencia pst = new Persistencia(directorio,emisoras);
 			
 			
-			ExecutorService pool = Executors.newCachedThreadPool();
-			ServerSocket server = null;
-			try {
-				server = new ServerSocket(8080);
-				while (true) {
-					try {
-						final Socket cliente = server.accept();
-						Persistencia pst = new Persistencia(directorio,emisoras);
-						pool.execute(pst);
-					}catch (IOException e) {e.printStackTrace();}
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}finally {
-				cerrar(server);
-				pool.shutdown();
-			}
+			System.out.println("###### PRUEBAS ######");
+			File f = pst.getCancion("8in8_-_05_-_Ill_Be_My_Mirror");
+			System.out.println(f.getName());
+			
+//			ExecutorService pool = Executors.newCachedThreadPool();
+//			ServerSocket server = null;
+//			try {
+//				server = new ServerSocket(8080);
+//				while (true) {
+//					try {
+//						final Socket cliente = server.accept();
+//						Persistencia pst = new Persistencia(directorio,emisoras);
+//						pool.execute(pst);
+//					}catch (IOException e) {e.printStackTrace();}
+//				}
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}finally {
+//				cerrar(server);
+//				pool.shutdown();
+//			}
+			
+			
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
@@ -64,22 +71,32 @@ public class Persistencia implements Runnable {
 		this.emisoras = emisoras;
 	}
 
-	//Falta
+	//Todos los archivos .mp3 en la carpeta this.directorio
 	private List<String> getCanciones(){
-		List<String> canciones = null;
-		
+		List<String> canciones = new ArrayList<>();
+		File p_canciones = new File(this.directorio);
+		File[] dire = p_canciones.listFiles();
+		if(p_canciones.exists()) {
+			for (int i = 0; i < dire.length; i++) {
+				canciones.add(dire[i].getName().split(".mp3")[0]);
+			}
+		}
 		return canciones;
 	}
 	
-	//Falta
 	private File getCancion(String c) {
-		File cancion = null;
+		File cancion = new File(this.directorio, c+".mp3");
+		if(!cancion.exists())System.out.println("El archivo no existe"); //Solo para pruebas.
 		return cancion;
 	}
 	
 	private List<String> getEmisoras(){
-		List<String> emisoras = null;
-		emisoras = (List<String>) this.emisoras.keySet();
+		String[] em = new String[this.emisoras.keySet().size()] ; 
+		em = this.emisoras.keySet().toArray(em);
+		List<String> emisoras = new ArrayList<>();
+		for (int i = 0; i < em.length; i++) {
+			emisoras.add(em[i]);
+		}
 		return emisoras;
 	}
 	
