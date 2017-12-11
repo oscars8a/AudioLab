@@ -6,13 +6,15 @@
 package cliente;
 
 import java.awt.event.ItemEvent;
-import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
+import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
-import javax.swing.ListModel;
+import javax.swing.JList;
 
 /**
  *
@@ -21,13 +23,13 @@ import javax.swing.ListModel;
 public class GUI extends javax.swing.JFrame {
 
     private Reproductor player;
-
     /**
      * Creates new form GUI
      */
     public GUI() {
         initComponents();
         player = new Reproductor();
+        this.inicializarLista("Canciones");
     }
 
     /**
@@ -91,6 +93,11 @@ public class GUI extends javax.swing.JFrame {
 
         listaCanciones.setToolTipText("Lista de Canciones");
         listaCanciones.setAutoscrolls(false);
+        listaCanciones.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                listaCancionesMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(listaCanciones);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -163,7 +170,6 @@ public class GUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_botonAnteriorMouseClicked
 
-    
     private void cambiarIndiceLista(String direccion) {
         int seleccion = this.listaCanciones.getSelectedIndex();
         switch (direccion) {
@@ -174,6 +180,12 @@ public class GUI extends javax.swing.JFrame {
                     } else {
                         this.listaCanciones.setSelectedIndex(this.listaCanciones.getModel().getSize() - 1);
                     }
+                    try{
+                            player.play(this.listaCanciones.getSelectedValue());
+                        }
+                        catch(IOException ex){
+                            ex.printStackTrace();
+                        }
                 }
                 break;
             case "Siguiente":
@@ -183,6 +195,12 @@ public class GUI extends javax.swing.JFrame {
                     } else {
                         this.listaCanciones.setSelectedIndex(0);
                     }
+                    try{
+                            player.play(this.listaCanciones.getSelectedValue());
+                        }
+                        catch(IOException ex){
+                            ex.printStackTrace();
+                        }
                 }
                 break;
         }
@@ -192,22 +210,43 @@ public class GUI extends javax.swing.JFrame {
         // TODO add your handling code here:
         if (evt.getStateChange() == ItemEvent.SELECTED) {
             String item = (String) evt.getItem();
-            DefaultListModel dlm = new DefaultListModel();
-            if (item.equals("Canciones")) {
-                // File f = new File ("C:/Users/Héctor/Música/DTM(TG)GreenDaRevRadi/DTM(TG)GreenDaRevRadi/Green Day - Revolution Radio (2016)");
-                // for(int i = 0; i< f.listFiles().length; i++){
-                //    dlm.addElement(f.listFiles()[i].getName());
-                // }
-                this.listaCanciones.setModel(dlm);
-                //Llamar a getCanciones
-                //gui.listaCanciones.setModel((DefaultListModel)negocio.getCanciones());
-            } else if (item.equals("Emisoras")) //Llamar a getEmisoras
-            {
-
-            }
+            inicializarLista(item);
         }
     }//GEN-LAST:event_comboTiposItemStateChanged
 
+    private void listaCancionesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_listaCancionesMouseClicked
+        // TODO add your handling code here:
+        JList list = (JList)evt.getSource();
+        if (evt.getClickCount() == 2) {
+            int index = list.locationToIndex(evt.getPoint());
+            if (index >= 0) {
+                Object o = list.getModel().getElementAt(index);
+                try{
+                    player.play(o.toString());
+                } catch (IOException ex) {
+                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } 
+        }
+    }//GEN-LAST:event_listaCancionesMouseClicked
+
+    
+    private void inicializarLista(String item){
+        DefaultListModel dlm = new DefaultListModel();
+            ArrayList<String> lista = new ArrayList<>();
+            if (item.equals("Canciones")) {
+                lista = player.getLista("Canciones");
+            } else if (item.equals("Emisoras")) //Llamar a getEmisoras
+            {
+                lista = player.getLista("Emisoras");
+            }
+            
+            //Hay que hacer esto para pasar el ArrayList a una DefaultListModel
+            for(int i = 0, n= lista.size(); i<n; i++)
+                dlm.addElement(lista.get(i));
+            this.listaCanciones.setModel(dlm);
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -241,13 +280,6 @@ public class GUI extends javax.swing.JFrame {
                 GUI gui = new GUI();
                 gui.setVisible(true);
                 //Cambiar esta siguiente línea por el método pertinente para recoger canciones
-                //DefaultListModel canciones = (DefaultListModel) negocio.getCanciones();
-                DefaultListModel def = new DefaultListModel();
-
-                for (int i = 0; i < 20; ++i) {
-                    def.addElement("Cancion " + i);
-                }
-                gui.listaCanciones.setModel(def);
             }
         });
     }
