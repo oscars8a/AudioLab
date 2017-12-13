@@ -47,29 +47,10 @@ public class Reproductor {
         if(rep != null){
             rep.cancel();
         }
+            
+	OutputStreamWriter osw = null;      
         
-        //Tenemos que conseguir que la ejecución de arriba termine antes de entrar en lo de abajo siempre. De otro modo no funcionará.
-        
-	OutputStreamWriter osw = null;
-        
-//		try {
-//			s = new Socket("localhost", 5050);
-//			is = new BufferedInputStream(s.getInputStream());
-//			AudioInputStream ais = AudioSystem.getAudioInputStream(is);
-//			
-//					c = AudioSystem.getClip();
-//			    c.open(ais);
-//			    try {
-//			      c.start();
-//			  } finally {
-//			    ais.close();
-//			  }
-//    }
-//		catch(IOException | LineUnavailableException | UnsupportedAudioFileException ex) {
-//			ex.printStackTrace();
-//		}      
-           try{
-          
+        try{ 
            server = new Socket("localhost", 5050);
            osw = new OutputStreamWriter(server.getOutputStream());
            is = new BufferedInputStream(server.getInputStream());
@@ -85,26 +66,7 @@ public class Reproductor {
  
             rep = new Reproduccion(server, is, audioLine, format, ais);
             rep.start();      
-        
-//        if(media != null && media.isRunning()){
-//            media.close();
-//        }
-//        
-//        try (Socket server = new Socket("localhost", 5050);
-//                OutputStreamWriter osw = new OutputStreamWriter(server.getOutputStream());
-//                InputStream is = new BufferedInputStream(server.getInputStream())){
-//            rite("PLAY SONG "+s+System.getProperty("line.separator"));
-//            osw.flush();
-//            osw.w
-//            
-//            AudioInputStream ais = AudioSystem.getAudioInputStream(is);
-//            media = AudioSystem.getClip();
-//            media.open(ais);
-//            media.start();
-//            
-//        } catch (UnsupportedAudioFileException | LineUnavailableException ex) {
-//            Logger.getLogger(Reproductor.class.getName()).log(Level.SEVERE, null, ex);
-//        }
+ 
     }   catch (LineUnavailableException | UnsupportedAudioFileException ex) {
             Logger.getLogger(Reproductor.class.getName()).log(Level.SEVERE, null, ex);
     }
@@ -127,7 +89,7 @@ public class Reproductor {
         
         ArrayList<String> lista = new ArrayList<>();
         
-        try(Socket s = new Socket("localhost", 4050);
+        try(Socket s = new Socket("localhost", 5050);
                 OutputStreamWriter osw = new OutputStreamWriter(s.getOutputStream());
                     BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()))){
             

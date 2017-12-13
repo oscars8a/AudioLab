@@ -183,7 +183,7 @@ public class GUI extends javax.swing.JFrame {
                     try{
                             player.play(this.listaCanciones.getSelectedValue());
                         }
-                        catch(IOException ex){
+                        catch(IOException | InterruptedException ex){
                             ex.printStackTrace();
                         }
                 }
@@ -198,7 +198,7 @@ public class GUI extends javax.swing.JFrame {
                     try{
                             player.play(this.listaCanciones.getSelectedValue());
                         }
-                        catch(IOException ex){
+                        catch(IOException | InterruptedException ex){
                             ex.printStackTrace();
                         }
                 }
@@ -223,7 +223,7 @@ public class GUI extends javax.swing.JFrame {
                 Object o = list.getModel().getElementAt(index);
                 try{
                     player.play(o.toString());
-                } catch (IOException ex) {
+                } catch (IOException | InterruptedException ex) {
                     Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } 

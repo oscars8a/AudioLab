@@ -23,7 +23,6 @@ import javax.sound.sampled.SourceDataLine;
 public class Reproduccion extends Thread {
     
     private int BUFFER_SIZE = 4096;
-
     private Socket server;
     private InputStream is;
     private SourceDataLine audioLine;
