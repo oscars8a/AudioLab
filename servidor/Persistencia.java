@@ -7,10 +7,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,9 +34,12 @@ public class Persistencia implements Runnable {
 		BufferedReader br = null;
 		DataOutputStream dos = null;
 		FileInputStream fis = null;
+		PrintStream ps = null;
 		try {
 			br = new BufferedReader(new InputStreamReader(cliente.getInputStream()));
 			dos = new DataOutputStream(cliente.getOutputStream());
+			ps = new PrintStream(cliente.getOutputStream());
+			
 			String linea;
 			if((linea = br.readLine()) != null) {
 				//Protocolo:
@@ -46,15 +51,20 @@ public class Persistencia implements Runnable {
 				if(linea.compareTo("FETCH SONGS")==0) {
 					List<String> songs = this.getCanciones();
 					for (int i = 0; i < songs.size(); i++) {
-						dos.writeChars(songs.get(i)+"\n");
+						ps.println(songs.get(i));
 					}
+					ps.flush();
 				}else if(linea.compareTo("FETCH PODCAST")==0) {
 					List<String> emisoras = this.getEmisoras();
 					for (int i = 0; i < emisoras.size(); i++) {
-						dos.writeChars(emisoras.get(i)+"\n");
+						ps.println(emisoras.get(i));
 					}
+					ps.flush();
 				}else if(linea.startsWith("PLAY SONG")) {
-					String cancion = linea.split("PLAY SONG ")[1];
+					String c = linea.split("PLAY SONG ")[1];
+					c = "Canals.wav";//Pruebas
+					File cancion = new File(directorio, c);
+					if(!cancion.exists())System.out.println("Archivo no encontrado."); //Solo para pruebas.
 					fis = new FileInputStream(cancion);
 					int leidos;
 		            byte[] buff = new byte[1024];      
@@ -63,9 +73,10 @@ public class Persistencia implements Runnable {
 		            }
 		            dos.flush();
 				}else if(linea.startsWith("PLAY PODCAST")) {
-					//FALTAAAAAAAA
+					String p = linea.split("PLAY PODCAST ")[1];
+//					URLConnection url =  
 				}
-				dos.flush();
+				
 	            cliente.shutdownOutput();
 	            
 	            System.out.println("Enviando...");
@@ -78,6 +89,7 @@ public class Persistencia implements Runnable {
 			cerrar(dos);
 			cerrar(fis);
 			cerrar(br);
+			cerrar(ps);
 		}
 
 	}
@@ -85,7 +97,7 @@ public class Persistencia implements Runnable {
 	public static void main(String[] args) {
 		try {
 			String directorio = "src/public_canciones";
-			int puerto = 4050;
+			int puerto = 5050;
 			
 			Map<String,URL> emisoras = new HashMap<String, URL>();
 			emisoras.put("rock_fm", new URL("http://player.rockfm.fm/"));
