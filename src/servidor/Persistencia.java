@@ -2,23 +2,29 @@ package servidor;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.io.RandomAccessFile;
 import java.net.MalformedURLException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import javax.swing.SpringLayout;
 
 
 
@@ -39,8 +45,8 @@ public class Persistencia implements Runnable {
 			br = new BufferedReader(new InputStreamReader(cliente.getInputStream()));
 			dos = new DataOutputStream(cliente.getOutputStream());
 			ps = new PrintStream(cliente.getOutputStream());
-			
 			String linea;
+                        String pos;
 			if((linea = br.readLine()) != null) {
 				//Protocolo:
 				//FETCH SONGS
@@ -61,13 +67,22 @@ public class Persistencia implements Runnable {
 					}
 					ps.flush();
 				}else if(linea.startsWith("PLAY SONG")) {
+                                    /*En caso de que la posición recibida sea mayor que cero, envía la nueva
+                                    Cabecera WAVE del fichero y, a continuación, el fichero a partir de la posición
+                                    solicitada.
+                                    En caso contrario envía el fichero desde el principio.*/
 					String c = linea.split("PLAY SONG ")[1];
-					File cancion = new File(directorio, c);
-					if(!cancion.exists())System.out.println("Archivo no encontrado."); //Solo para pruebas.
-					fis = new FileInputStream(cancion);
-					int leidos;
-		            byte[] buff = new byte[1024];      
-		            while ((leidos = fis.read(buff)) != -1) {
+                                        pos = br.readLine().split("FROM ")[1];
+					File f = new File(directorio, c);
+                                        System.out.println(pos);
+                                        byte[] buff = new byte[1024];
+                                        if(Integer.parseInt(pos)>0){
+                                             enviarWavHeader(dos, f, Long.parseLong(pos));
+                                        }
+                            RandomAccessFile cancion = new RandomAccessFile(f, "r");
+                            cancion.seek(Long.parseLong(pos));
+                            int leidos;
+		            while ((leidos = cancion.read(buff)) != -1) {
 		                dos.write(buff, 0, leidos);
 		            }
 		            dos.flush();
@@ -75,16 +90,18 @@ public class Persistencia implements Runnable {
 					String p = linea.split("PLAY PODCAST ")[1];
 //					URLConnection url =  
 				}
-				
 	            cliente.shutdownOutput();
-	            
 	            System.out.println("Enviando...");
-
 			}
 			
 		} catch (IOException e) {
-			e.printStackTrace();
-		}finally {
+			if (e.getClass().equals(SocketException.class))
+                                System.out.println("Cierre de conexion con cliente");
+                        else{
+                            e.printStackTrace();
+                        }
+		} 
+                finally {
 			cerrar(dos);
 			cerrar(fis);
 			cerrar(br);
@@ -92,6 +109,40 @@ public class Persistencia implements Runnable {
 		}
 
 	}
+        
+        //Construyo la cabecera WAVE para enviar streams de ficheros WAV que no comiencen desde el principio.
+        private static void enviarWavHeader(DataOutputStream os, File f, long size){
+            
+            DataInputStream dis = null;
+            
+            try{
+                dis = new DataInputStream(new FileInputStream(f));
+                int[] header = new int[44];
+                for(int i =0; i<44; i++)
+                    header[i] = dis.read();
+                
+                //La clase ByteBuffer ha sido necesaria para realizar esta tarea. Es java.nio
+                byte [] tamaño = ByteBuffer.allocate(4).putInt((int)(f.length()-size+44)).array();
+                for(int j = tamaño.length; j>0; j--){
+                    header[7-j+1] = tamaño[j-1] &0xff;
+                }
+            
+                for(int k = 0; k<44; k++){
+                    System.out.println(header[k]);
+                    os.write(header[k]);
+                }
+                os.flush();
+                
+            }
+            catch(IOException ex){
+                ex.printStackTrace();
+            }
+            finally{
+                cerrar(dis);
+            }
+            
+            
+        }
 
 	public static void main(String[] args) {
 		try {

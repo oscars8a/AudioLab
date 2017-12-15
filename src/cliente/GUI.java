@@ -21,7 +21,7 @@ import javax.swing.JList;
  * @author Héctor
  */
 public class GUI extends javax.swing.JFrame {
-
+    
     private Reproductor player;
     /**
      * Creates new form GUI
@@ -180,12 +180,7 @@ public class GUI extends javax.swing.JFrame {
                     } else {
                         this.listaCanciones.setSelectedIndex(this.listaCanciones.getModel().getSize() - 1);
                     }
-                    try{
-                            player.play(this.listaCanciones.getSelectedValue());
-                        }
-                        catch(IOException | InterruptedException ex){
-                            ex.printStackTrace();
-                        }
+                    player.play(this.listaCanciones.getSelectedValue(), 0);
                 }
                 break;
             case "Siguiente":
@@ -195,12 +190,7 @@ public class GUI extends javax.swing.JFrame {
                     } else {
                         this.listaCanciones.setSelectedIndex(0);
                     }
-                    try{
-                            player.play(this.listaCanciones.getSelectedValue());
-                        }
-                        catch(IOException | InterruptedException ex){
-                            ex.printStackTrace();
-                        }
+                    player.play(this.listaCanciones.getSelectedValue(), 0);
                 }
                 break;
         }
@@ -221,11 +211,7 @@ public class GUI extends javax.swing.JFrame {
             int index = list.locationToIndex(evt.getPoint());
             if (index >= 0) {
                 Object o = list.getModel().getElementAt(index);
-                try{
-                    player.play(o.toString());
-                } catch (IOException | InterruptedException ex) {
-                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
-                }
+             player.play(o.toString(), 0);
             } 
         }
     }//GEN-LAST:event_listaCancionesMouseClicked
