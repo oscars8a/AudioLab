@@ -5,83 +5,53 @@
  */
 package cliente;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.sound.sampled.*;
 
-/**
- *
- * @author hejimeno
- */
 public class Reproductor {
-    
-    private SourceDataLine sdl;
-    private Clip media;
     private long posicion;
-    Reproduccion rep;
-    private Socket server;
-    private InputStream is;
+    private Reproduccion rep;
+    private String audioActual;
+    private float volumen;
+
     
-    public Reproductor(){
-        this.media = null;
+    public Reproductor(float vol){
         this.posicion=0;
-        this.sdl = null;
         this.rep = null;
-        this.server = null;
-        this.is = null;
+        this.audioActual = null;
+        this.volumen = vol;
     }
       
-    protected void play(String s) throws IOException, InterruptedException{
-       	
+    protected void play(String s, long posicion){
+        this.audioActual = s;
         //cerrarHilo();
         if(rep != null){
+            rep.interrupt();
             rep.cancel();
         }
-            
-	OutputStreamWriter osw = null;      
-        
-        try{ 
-           server = new Socket("localhost", 5050);
-           osw = new OutputStreamWriter(server.getOutputStream());
-           is = new BufferedInputStream(server.getInputStream());
-            osw.write("PLAY SONG "+s+System.getProperty("line.separator"));
-            osw.flush();
-            AudioInputStream ais = AudioSystem.getAudioInputStream(is);     	
- 
-            AudioFormat format = ais.getFormat();
- 
-            DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
- 
-            SourceDataLine audioLine = (SourceDataLine) AudioSystem.getLine(info);
- 
-            rep = new Reproduccion(server, is, audioLine, format, ais);
-            rep.start();      
- 
-    }   catch (LineUnavailableException | UnsupportedAudioFileException ex) {
-            Logger.getLogger(Reproductor.class.getName()).log(Level.SEVERE, null, ex);
-    }
+        rep = new Reproduccion(s, posicion, volumen);
+        rep.start();     
 }
-    //Si el clip está reproduciéndose, se pausa y se guarda la última posición reproducida. 
+    //Si el audio está reproduciéndose, se pausa y se guarda la última posición reproducida. 
     //En caso contrario, se reanuda, reproduciendo a partir del momento exacto en que se quedó.
     protected void resumePause(){
-        if(media.isRunning()) {
-        	media.stop();
-        	posicion = media.getMicrosecondPosition();
+        if(rep.isAlive())
+            posicion = rep.pause();
+        else{
+            this.play(audioActual, posicion);
         }
-        else {
-        	media.setMicrosecondPosition(posicion);
-        	media.start();
-        }
+    }
+
+    public void cambiarVolumen(float vol){
+        this.volumen=vol;
+        rep.cambiarVolumen(vol);
     }
     
     //Recoge la lista de todas las canciones o emisoras del servidor.
@@ -115,7 +85,6 @@ public class Reproductor {
         return lista;
         
     }
-    
      private void cerrar(Closeable o){
         try{
             if(o!=null){

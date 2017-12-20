@@ -5,14 +5,12 @@
  */
 package cliente;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ItemEvent;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javafx.scene.paint.Color;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 
@@ -21,14 +19,17 @@ import javax.swing.JList;
  * @author Héctor
  */
 public class GUI extends javax.swing.JFrame {
-
+    
     private Reproductor player;
     /**
      * Creates new form GUI
      */
     public GUI() {
         initComponents();
-        player = new Reproductor();
+        //Estas dos líneas son para que siempre aparezca en el centro de la pantalla
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+        this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
+        player = new Reproductor(this.sliderVolumen.getValue());
         this.inicializarLista("Canciones");
     }
 
@@ -52,24 +53,45 @@ public class GUI extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("AudioLab");
+        setBackground(new java.awt.Color(153, 153, 153));
+        setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        setFont(new java.awt.Font("Verdana", 0, 10)); // NOI18N
+        setForeground(new java.awt.Color(204, 204, 204));
         setName("Panel"); // NOI18N
         setResizable(false);
 
-        botonPlayPause.setLabel("Play/Pause");
+        botonPlayPause.setIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/PlayPause50x50.png"))); // NOI18N
+        botonPlayPause.setText("");
+        botonPlayPause.setToolTipText("Pausar / Resumir");
+        botonPlayPause.setBorder(null);
+        botonPlayPause.setContentAreaFilled(false);
+        botonPlayPause.setPressedIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/PlayPausePressed50x50.png"))); // NOI18N
         botonPlayPause.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 botonPlayPauseMouseClicked(evt);
             }
         });
 
-        botonSiguiente.setLabel("Siguiente");
+        botonSiguiente.setIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/Siguiente50x50.png"))); // NOI18N
+        botonSiguiente.setText("");
+        botonSiguiente.setToolTipText("Siguiente");
+        botonSiguiente.setBorder(null);
+        botonSiguiente.setBorderPainted(false);
+        botonSiguiente.setContentAreaFilled(false);
+        botonSiguiente.setPressedIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/SiguientePressed50x50.png"))); // NOI18N
         botonSiguiente.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 botonSiguienteMouseClicked(evt);
             }
         });
 
-        botonAnterior.setLabel("Anterior");
+        botonAnterior.setIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/Anterior50x50.png"))); // NOI18N
+        botonAnterior.setText("");
+        botonAnterior.setToolTipText("Anterior");
+        botonAnterior.setBorder(null);
+        botonAnterior.setBorderPainted(false);
+        botonAnterior.setContentAreaFilled(false);
+        botonAnterior.setPressedIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/AnteriorPressed50x50.png"))); // NOI18N
         botonAnterior.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 botonAnteriorMouseClicked(evt);
@@ -78,7 +100,14 @@ public class GUI extends javax.swing.JFrame {
 
         jProgressBar1.setStringPainted(true);
 
+        sliderVolumen.setToolTipText("Volumen");
+        sliderVolumen.setValue(90);
         sliderVolumen.setName(""); // NOI18N
+        sliderVolumen.addChangeListener(new javax.swing.event.ChangeListener() {
+            public void stateChanged(javax.swing.event.ChangeEvent evt) {
+                sliderVolumenStateChanged(evt);
+            }
+        });
 
         comboTipos.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Canciones", "Emisoras" }));
         comboTipos.setName("listadoOrigenes"); // NOI18N
@@ -116,14 +145,14 @@ public class GUI extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jProgressBar1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(22, 22, 22)
+                        .addGap(93, 93, 93)
                         .addComponent(botonAnterior)
                         .addGap(18, 18, 18)
                         .addComponent(botonPlayPause)
                         .addGap(18, 18, 18)
                         .addComponent(botonSiguiente)
-                        .addGap(0, 14, Short.MAX_VALUE))
-                    .addComponent(jScrollPane1))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 345, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -180,12 +209,7 @@ public class GUI extends javax.swing.JFrame {
                     } else {
                         this.listaCanciones.setSelectedIndex(this.listaCanciones.getModel().getSize() - 1);
                     }
-                    try{
-                            player.play(this.listaCanciones.getSelectedValue());
-                        }
-                        catch(IOException | InterruptedException ex){
-                            ex.printStackTrace();
-                        }
+                    player.play(this.listaCanciones.getSelectedValue(), 0);
                 }
                 break;
             case "Siguiente":
@@ -195,12 +219,7 @@ public class GUI extends javax.swing.JFrame {
                     } else {
                         this.listaCanciones.setSelectedIndex(0);
                     }
-                    try{
-                            player.play(this.listaCanciones.getSelectedValue());
-                        }
-                        catch(IOException | InterruptedException ex){
-                            ex.printStackTrace();
-                        }
+                    player.play(this.listaCanciones.getSelectedValue(), 0);
                 }
                 break;
         }
@@ -221,14 +240,15 @@ public class GUI extends javax.swing.JFrame {
             int index = list.locationToIndex(evt.getPoint());
             if (index >= 0) {
                 Object o = list.getModel().getElementAt(index);
-                try{
-                    player.play(o.toString());
-                } catch (IOException | InterruptedException ex) {
-                    Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
-                }
+             player.play(o.toString(), 0);
             } 
         }
     }//GEN-LAST:event_listaCancionesMouseClicked
+
+    private void sliderVolumenStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_sliderVolumenStateChanged
+
+        player.cambiarVolumen(this.sliderVolumen.getValue());
+    }//GEN-LAST:event_sliderVolumenStateChanged
 
     
     private void inicializarLista(String item){
