@@ -5,15 +5,12 @@
  */
 package cliente;
 
-import com.sun.media.sound.WaveFileReader;
 import java.io.BufferedInputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -21,7 +18,7 @@ import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
-
+import javax.sound.sampled.FloatControl;
 /**
  *
  * @author hejimeno
@@ -29,26 +26,18 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 public class Reproduccion extends Thread {
     
     private int BUFFER_SIZE = 1024;
-    private Socket server;
     private SourceDataLine audioLine;
     volatile boolean interrumpe; 
     private String cancion;
     private long posicion;
+    private float volumen;
     
-    public Reproduccion(String s, long pos){
+    public Reproduccion(String s, long pos, float vol){
         cancion = s;
         posicion = pos;
+        volumen = vol;
     }
-    
-//    public Reproduccion(Socket s, InputStream i, SourceDataLine line, AudioFormat formato, AudioInputStream audio){
-//        this.server =s;
-//        this.is = i;
-//        audioLine = line;
-//        format = formato;
-//        ais = audio;
-//        interrumpe = false;
-//    }
-    
+ 
     public void run(){
             
             Socket server = null;
@@ -70,8 +59,8 @@ public class Reproduccion extends Thread {
             DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
  
             audioLine = (SourceDataLine) AudioSystem.getLine(info);
- 
             audioLine.open(format);
+            cambiarVolumen(this.getVolumen());
             
             audioLine.start();
             System.out.println("Playback started.");
@@ -114,6 +103,23 @@ public class Reproduccion extends Thread {
     public long getPosicion(){
         return this.posicion;
     }
+    
+    public SourceDataLine getAudioLine(){
+        return this.audioLine;
+    }
+    
+    public void cambiarVolumen(float vol){
+        FloatControl control = (FloatControl) this.getAudioLine().getControl(FloatControl.Type.MASTER_GAIN);
+        if(vol != 0)
+            control.setValue(control.getMinimum() + ((control.getMaximum() - control.getMinimum())* vol/100));
+        else
+            control.setValue(control.getMinimum());
+    }
+    
+    public float getVolumen(){
+        return this.volumen;
+    }
+    
     private void cerrar(Closeable o){
         try{
             if(o!=null){
