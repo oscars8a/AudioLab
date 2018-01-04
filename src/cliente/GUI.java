@@ -61,7 +61,6 @@ public class GUI extends javax.swing.JFrame {
         setResizable(false);
 
         botonPlayPause.setIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/PlayPause50x50.png"))); // NOI18N
-        botonPlayPause.setText("");
         botonPlayPause.setToolTipText("Pausar / Resumir");
         botonPlayPause.setBorder(null);
         botonPlayPause.setContentAreaFilled(false);
@@ -73,7 +72,6 @@ public class GUI extends javax.swing.JFrame {
         });
 
         botonSiguiente.setIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/Siguiente50x50.png"))); // NOI18N
-        botonSiguiente.setText("");
         botonSiguiente.setToolTipText("Siguiente");
         botonSiguiente.setBorder(null);
         botonSiguiente.setBorderPainted(false);
@@ -86,7 +84,6 @@ public class GUI extends javax.swing.JFrame {
         });
 
         botonAnterior.setIcon(new javax.swing.ImageIcon(getClass().getResource("/assets/Anterior50x50.png"))); // NOI18N
-        botonAnterior.setText("");
         botonAnterior.setToolTipText("Anterior");
         botonAnterior.setBorder(null);
         botonAnterior.setBorderPainted(false);
@@ -167,9 +164,8 @@ public class GUI extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(botonAnterior)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(botonSiguiente)
-                        .addComponent(botonPlayPause))
+                    .addComponent(botonSiguiente)
+                    .addComponent(botonPlayPause)
                     .addComponent(sliderVolumen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
@@ -183,7 +179,14 @@ public class GUI extends javax.swing.JFrame {
 
     private void botonPlayPauseMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonPlayPauseMouseClicked
         // TODO add your handling code here:
+       if(!player.getIsPlaying()){
+        if(this.listaCanciones.isSelectionEmpty())
+           this.listaCanciones.setSelectedIndex(0);
+        player.play(this.listaCanciones.getSelectedValue(), 0);
+       }
+       else
         player.resumePause();
+
     }//GEN-LAST:event_botonPlayPauseMouseClicked
 
     private void botonSiguienteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonSiguienteMouseClicked

@@ -20,6 +20,7 @@ public class Reproductor {
     private Reproduccion rep;
     private String audioActual;
     private float volumen;
+    private boolean isPlaying;
 
     
     public Reproductor(float vol){
@@ -27,6 +28,7 @@ public class Reproductor {
         this.rep = null;
         this.audioActual = null;
         this.volumen = vol;
+        this.isPlaying = false;
     }
       
     protected void play(String s, long posicion){
@@ -35,9 +37,11 @@ public class Reproductor {
         if(rep != null){
             rep.interrupt();
             rep.cancel();
+            this.setIsPlaying(false);
         }
         rep = new Reproduccion(s, posicion, volumen);
-        rep.start();     
+        rep.start(); 
+        this.setIsPlaying(true);
 }
     //Si el audio está reproduciéndose, se pausa y se guarda la última posición reproducida. 
     //En caso contrario, se reanuda, reproduciendo a partir del momento exacto en que se quedó.
@@ -85,6 +89,15 @@ public class Reproductor {
         return lista;
         
     }
+    
+     public boolean getIsPlaying(){
+         return this.isPlaying;
+     }
+     
+     public void setIsPlaying(boolean b){
+         this.isPlaying = b;
+     }
+    
      private void cerrar(Closeable o){
         try{
             if(o!=null){

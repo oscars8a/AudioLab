@@ -54,7 +54,6 @@ public class Reproduccion extends Thread {
             osw.flush();
             
             ais = AudioSystem.getAudioInputStream(is);	
-            //ais.getAudioInputStream(is);
             AudioFormat format = ais.getFormat();
             DataLine.Info info = new DataLine.Info(SourceDataLine.class, format);
  
