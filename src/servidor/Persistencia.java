@@ -44,12 +44,12 @@ public class Persistencia implements Runnable {
     }
     
     /**
-     * MÈtodo run. Del hilo que se genera al aceptar una peticiÛn del cliente. 
-     * Proporciona informaciÛn en funciÛn del siguiente protocolo.
-     * 	FETCH SONGS				EnvÌa una lista con las canciones.
-     *  FETCH PODCAST			EnvÌa una lista con las emisoras.
-     *  PLAY SONG <canciÛn> 	EnvÌa un archivo .wav con la canciÛn <canciÛn>
-     *  PLAY PODCAST <emisora>	EnvÌa un buffer con la emisora <emisora> para su reproducciÛn. No implementado*
+     * M√©todo run. Del hilo que se genera al aceptar una petici√≥n del cliente. 
+     * Proporciona informaci√≥n en funci√≥n del siguiente protocolo.
+     * 	FETCH SONGS				Env√≠a una lista con las canciones.
+     *  FETCH PODCAST			Env√≠a una lista con las emisoras.
+     *  PLAY SONG <canci√≥n> 	Env√≠a un archivo .wav con la canci√≥n <canci√≥n>
+     *  PLAY PODCAST <emisora>	Env√≠a un buffer con la emisora <emisora> para su reproducci√≥n. No implementado*
      */
     @Override
     public void run() {
@@ -84,10 +84,10 @@ public class Persistencia implements Runnable {
                     }
                     ps.flush();
                 } else if (linea.startsWith("PLAY SONG")) {
-                    /*En caso de que la posici√≥n recibida sea mayor que cero, env√≠a la nueva
-                                    Cabecera WAVE del fichero y, a continuaci√≥n, el fichero a partir de la posici√≥n
+                    /*En caso de que la posici√É¬≥n recibida sea mayor que cero, env√É¬≠a la nueva
+                                    Cabecera WAVE del fichero y, a continuaci√É¬≥n, el fichero a partir de la posici√É¬≥n
                                     solicitada.
-                                    En caso contrario env√≠a el fichero desde el principio.*/
+                                    En caso contrario env√É¬≠a el fichero desde el principio.*/
                     String c = linea.split("PLAY SONG ")[1];
                     pos = br.readLine().split("FROM ")[1];
                     File f = this.getCancion(c);
@@ -127,8 +127,8 @@ public class Persistencia implements Runnable {
     }
 
     /**
-     * Reconstruye la cabecera del archivo wav original cambiando los bytes que indican su tamaÒo del 5 al 8
-     * por el nuevo tamaÒo del fichero.
+     * Reconstruye la cabecera del archivo wav original cambiando los bytes que indican su tama√±o del 5 al 8
+     * por el nuevo tama√±o del fichero.
      * @param os
      * @param f
      * @param size
@@ -166,16 +166,16 @@ public class Persistencia implements Runnable {
     }
 
     /**
-     * MÈtodo principal.
-     * Indica la ruta donde est·n los wav de las canciones, "src/public_canciones".
+     * M√©todo principal.
+     * Indica la ruta donde est√°n los wav de las canciones, "src/public_canciones".
      * Indica el puerto por donde va a recibir las peticiones, 5050.
      * Genera un objeto Map con el nombre de la emisora y su URL. Se desea utilizar archivos XML en un futuro.
-     * Genera un hilo Persistencia por cada peticiÛn aceptada. 
+     * Genera un hilo Persistencia por cada petici√≥n aceptada. 
      * @param args
      */
     public static void main(String[] args) {
         try {
-            String directorio = "src/public_canciones";
+            String directorio = "public_canciones";
             int puerto = 5050;
 
             Map<String, URL> emisoras = new HashMap<String, URL>();
@@ -211,7 +211,7 @@ public class Persistencia implements Runnable {
     }
 
     /**
-     * MÈtodo que devuelve una lista con los nombres de las canciones disponibles en la ruta "directorio".
+     * M√©todo que devuelve una lista con los nombres de las canciones disponibles en la ruta "directorio".
      * @return
      */
     //Todos los archivos .wav en la carpeta this.directorio
@@ -228,7 +228,7 @@ public class Persistencia implements Runnable {
     }
     
     /**
-     * MÈtodo que devuelve una lista con los nombres de las emisoras disponibles.
+     * M√©todo que devuelve una lista con los nombres de las emisoras disponibles.
      * @return
      */
     private List<String> getEmisoras() {
@@ -242,17 +242,17 @@ public class Persistencia implements Runnable {
     }
 
     /**
-     * MÈtodo para sacar una canciÛn especÌfica.
-     * @param c .Nombre de la canciÛn.wav
-     * @return Devuelve el archivo .wav con la canciÛn.
+     * M√©todo para sacar una canci√≥n espec√≠fica.
+     * @param c .Nombre de la canci√≥n.wav
+     * @return Devuelve el archivo .wav con la canci√≥n.
      */
     private File getCancion(String c){
         return new File(directorio, c);
     }
     
     /**
-     * MÈtodo para obtener la url de una emisora ya almacenada a partir de su clave.
-     * @param clave con la que est· mapeada la url de la emisora.
+     * M√©todo para obtener la url de una emisora ya almacenada a partir de su clave.
+     * @param clave con la que est√° mapeada la url de la emisora.
      * @return la URL de la URL
      */
     private URL getEmisora(String k) {
@@ -261,7 +261,7 @@ public class Persistencia implements Runnable {
     }
 
     /**
-     * MÈtodo auxiliar para cerrar objetos closeables.
+     * M√©todo auxiliar para cerrar objetos closeables.
      */
     private static void cerrar(Closeable o) {
         try {
