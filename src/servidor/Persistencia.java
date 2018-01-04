@@ -23,6 +23,13 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * 
+ * Atributos:
+ * 		directorio. Ruta donde se encuentran los archivos .wav con las canciones.  
+ *		emirosas. Objeto Map donde se guarda el nombre de la emisora con su URL.
+ *		cliente. Objeto Socket para recibir peticiones. Por el puerto 5050.
+ */
 public class Persistencia implements Runnable {
 
     private String directorio;
@@ -36,6 +43,14 @@ public class Persistencia implements Runnable {
         this.cliente = cliente;
     }
     
+    /**
+     * Método run. Del hilo que se genera al aceptar una petición del cliente. 
+     * Proporciona información en función del siguiente protocolo.
+     * 	FETCH SONGS				Envía una lista con las canciones.
+     *  FETCH PODCAST			Envía una lista con las emisoras.
+     *  PLAY SONG <canción> 	Envía un archivo .wav con la canción <canción>
+     *  PLAY PODCAST <emisora>	Envía un buffer con la emisora <emisora> para su reproducción. No implementado*
+     */
     @Override
     public void run() {
 
@@ -111,6 +126,13 @@ public class Persistencia implements Runnable {
 
     }
 
+    /**
+     * Reconstruye la cabecera del archivo wav original cambiando los bytes que indican su tamaño del 5 al 8
+     * por el nuevo tamaño del fichero.
+     * @param os
+     * @param f
+     * @param size
+     */
     //Construyo la cabecera WAVE para enviar streams de ficheros WAV que no comiencen desde el principio.
     private static void enviarWavHeader(DataOutputStream os, File f, long size) {
 
@@ -124,9 +146,9 @@ public class Persistencia implements Runnable {
             }
 
             //La clase ByteBuffer ha sido necesaria para realizar esta tarea. Es java.nio
-            byte[] tamaÃ±o = ByteBuffer.allocate(4).putInt((int) (f.length() - size + 44)).array();
-            for (int j = tamaÃ±o.length; j > 0; j--) {
-                header[7 - j + 1] = tamaÃ±o[j - 1] & 0xff;
+            byte[] tamanio = ByteBuffer.allocate(4).putInt((int) (f.length() - size + 44)).array();
+            for (int j = tamanio.length; j > 0; j--) {
+                header[7 - j + 1] = tamanio[j - 1] & 0xff;
             }
 
             for (int k = 0; k < 44; k++) {
@@ -143,6 +165,14 @@ public class Persistencia implements Runnable {
 
     }
 
+    /**
+     * Método principal.
+     * Indica la ruta donde están los wav de las canciones, "src/public_canciones".
+     * Indica el puerto por donde va a recibir las peticiones, 5050.
+     * Genera un objeto Map con el nombre de la emisora y su URL. Se desea utilizar archivos XML en un futuro.
+     * Genera un hilo Persistencia por cada petición aceptada. 
+     * @param args
+     */
     public static void main(String[] args) {
         try {
             String directorio = "src/public_canciones";
@@ -180,6 +210,10 @@ public class Persistencia implements Runnable {
 
     }
 
+    /**
+     * Método que devuelve una lista con los nombres de las canciones disponibles en la ruta "directorio".
+     * @return
+     */
     //Todos los archivos .wav en la carpeta this.directorio
     private List<String> getCanciones() {
         List<String> canciones = new ArrayList<>();
@@ -192,12 +226,11 @@ public class Persistencia implements Runnable {
         }
         return canciones;
     }
-
-//	private File getCancion(String c) {
-//		File cancion = new File(directorio, c+".wav");
-//		if(!cancion.exists())System.out.println("El archivo no existe"); //Solo para pruebas.
-//		return cancion;
-//	}
+    
+    /**
+     * Método que devuelve una lista con los nombres de las emisoras disponibles.
+     * @return
+     */
     private List<String> getEmisoras() {
         String[] em = new String[emisoras.keySet().size()];
         em = emisoras.keySet().toArray(em);
@@ -208,15 +241,28 @@ public class Persistencia implements Runnable {
         return emisoras;
     }
 
+    /**
+     * Método para sacar una canción específica.
+     * @param c .Nombre de la canción.wav
+     * @return Devuelve el archivo .wav con la canción.
+     */
     private File getCancion(String c){
         return new File(directorio, c);
     }
     
+    /**
+     * Método para obtener la url de una emisora ya almacenada a partir de su clave.
+     * @param clave con la que está mapeada la url de la emisora.
+     * @return la URL de la URL
+     */
     private URL getEmisora(String k) {
         URL emisora = emisoras.get(k);
         return emisora;
     }
 
+    /**
+     * Método auxiliar para cerrar objetos closeables.
+     */
     private static void cerrar(Closeable o) {
         try {
             if (o != null) {
