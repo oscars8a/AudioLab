@@ -19,11 +19,18 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.sound.sampled.FloatControl;
-/**
- *
- * @author hejimeno
- */
+
+//Clase Reproducción. Gestiona la reproducción actual
 public class Reproduccion extends Thread {
+    
+     /**
+      * Atributos:
+      *     BUFFER_SIZE: Tamaño del buffer a utilizar para leer del socket
+      *     audioLine: La línea de audio utilizada para reproduccir el stream
+      *     cancion: el nombre de la canción a pedir al servidor
+      *     posición: la posición en la que se encuentra la reproducción
+      *     volumen: el volumen actual de la reproducción.
+      */
     
     private int BUFFER_SIZE = 1024;
     private SourceDataLine audioLine;
@@ -38,6 +45,10 @@ public class Reproduccion extends Thread {
         volumen = vol;
     }
  
+    /**
+     * Pide al servidor que le envíe el stream de la canción seleccionada
+     * a partir de la posición especificada y con el volumen establecido.
+     */
     public void run(){
             
             Socket server = null;
@@ -84,29 +95,51 @@ public class Reproduccion extends Thread {
             }
     }  
     
+    /**
+     * interrumpe la reproducción.
+     */
     public void cancel(){
         
         this.interrumpe = true;
     }
     
+    /**
+     * 
+     * @return el nombre de la canción que se está reproduciendo.
+     */
     public String getCancion(){
         return this.cancion;
     }
     
+    /**
+     * 
+     * @return pausa la reproducción actual, cerrando este hilo.
+     */
     public long pause(){
         this.cancel();
-        //posicion = totalLeido;
         return this.getPosicion();
     }
     
+    /**
+     * 
+     * @return la última posición guardada de la reproducción 
+     */
     public long getPosicion(){
         return this.posicion;
     }
     
+    /**
+     * 
+     * @return la línea de reproducción 
+     */
     public SourceDataLine getAudioLine(){
         return this.audioLine;
     }
     
+    /**
+     * regula el volumen de la reproducción
+     * @param vol 
+     */
     public void cambiarVolumen(float vol){
         FloatControl control = (FloatControl) this.getAudioLine().getControl(FloatControl.Type.MASTER_GAIN);
         if(vol != 0)
@@ -115,6 +148,10 @@ public class Reproduccion extends Thread {
             control.setValue(control.getMinimum());
     }
     
+    /**
+     * 
+     * @return el volumen actual 
+     */
     public float getVolumen(){
         return this.volumen;
     }

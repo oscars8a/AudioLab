@@ -10,14 +10,9 @@ import java.awt.Toolkit;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import javafx.scene.paint.Color;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 
-/**
- *
- * @author Héctor
- */
 public class GUI extends javax.swing.JFrame {
     
     private Reproductor player;
@@ -177,6 +172,15 @@ public class GUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     * Si no se ha reproducido nada anteriormente existen dos casos:
+     *  1. Si no hay nada seleccionado, selecciona el primer elemento de la
+     *  lista y lo reproduce.
+     *  2. Si hay un elemento seleccionado lo reproduce.
+     * Si se ha reproducido algo anteriormente:
+     *  Pausa / reanuda la reproducción actual.
+     * @param evt 
+     */
     private void botonPlayPauseMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonPlayPauseMouseClicked
         // TODO add your handling code here:
        if(!player.getIsPlaying()){
@@ -189,12 +193,20 @@ public class GUI extends javax.swing.JFrame {
 
     }//GEN-LAST:event_botonPlayPauseMouseClicked
 
+    /**
+     * Cambia el índice de la lista al siguiente del seleccionado
+     * @param evt 
+     */
     private void botonSiguienteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonSiguienteMouseClicked
         if (evt.getButton() == MouseEvent.BUTTON1) {
             cambiarIndiceLista("Siguiente");
         }
     }//GEN-LAST:event_botonSiguienteMouseClicked
 
+    /**
+     * Cambia el índice de la lista al anterior del seleccionado
+     * @param evt 
+     */
     private void botonAnteriorMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonAnteriorMouseClicked
 
         if (evt.getButton() == MouseEvent.BUTTON1) {
@@ -202,6 +214,10 @@ public class GUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_botonAnteriorMouseClicked
 
+    /**
+     * Cambia el índice de la lista y reproduce la nueva selección.
+     * @param direccion el elemento anterior o siguiente al seleccionado
+     */
     private void cambiarIndiceLista(String direccion) {
         int seleccion = this.listaCanciones.getSelectedIndex();
         switch (direccion) {
@@ -228,6 +244,11 @@ public class GUI extends javax.swing.JFrame {
         }
     }
     
+    /**
+     * Pide al servidor que le envíe la lista correspondiente a cada elemento
+     * del comboBox.
+     * @param evt 
+     */
     private void comboTiposItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_comboTiposItemStateChanged
         // TODO add your handling code here:
         if (evt.getStateChange() == ItemEvent.SELECTED) {
@@ -236,6 +257,10 @@ public class GUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_comboTiposItemStateChanged
 
+    /**
+     * Comienza a reproducir la canción seleccionada al hacer doble click.
+     * @param evt 
+     */
     private void listaCancionesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_listaCancionesMouseClicked
         // TODO add your handling code here:
         JList list = (JList)evt.getSource();
@@ -248,12 +273,19 @@ public class GUI extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_listaCancionesMouseClicked
 
+    /**
+     * Cambia el volumen de la reproducción
+     * @param evt 
+     */
     private void sliderVolumenStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_sliderVolumenStateChanged
 
         player.cambiarVolumen(this.sliderVolumen.getValue());
     }//GEN-LAST:event_sliderVolumenStateChanged
 
-    
+    /**
+     * Pide al servidor que le envíe la lista correspondiente
+     * @param item la lista a pedir al servidor
+     */
     private void inicializarLista(String item){
         DefaultListModel dlm = new DefaultListModel();
             ArrayList<String> lista = new ArrayList<>();
